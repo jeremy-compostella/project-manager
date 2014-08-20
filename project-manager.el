@@ -28,8 +28,10 @@
 	:test 'string= :key 'pm-backend-name))
 
 (defun switch-project (project-name)
-  (interactive (list (ido-completing-read (format "Project name (current %s): "
-						  (project-name current-project))
+  (interactive (list (ido-completing-read (format "Project name%s: "
+						  (if current-project
+						      (concat " (" (project-name current-project) ")")
+						    ""))
 					  (mapcar 'project-name projects) nil t)))
   (let* ((project (find project-name projects :key 'project-name :test 'string=))
 	 (backend (project-pm-backend project)))
