@@ -11,7 +11,7 @@
 ;; Internal
 (defconst pm-android-targets
   '(("auto"			.       pm-android-build-current)
-    ("flashfiles"		.	"flashfiles")
+    ("dist"			.	"dist")
     ("boot"			.	"bootimage")
     ("recovery"			.	"recoveryimage")
     ("adb-fastboot"		.       "adb fastboot")
