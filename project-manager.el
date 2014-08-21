@@ -1,3 +1,5 @@
+(require 'cl)
+
 (defstruct project
   name
   pm-backend
@@ -46,7 +48,7 @@
 (defun project-uniquify-buffer-name (suffix)
   (let ((filename (buffer-file-name buf)))
     (rename-buffer (concat (file-name-nondirectory filename)
-			   "<" (project-name current-project ":" suffix ">")))))
+			   "<" (project-name current-project) ":" suffix ">"))))
 
 (defun pm-register-backend (backend)
   (add-to-list 'pm-backends backend nil
