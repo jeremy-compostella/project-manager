@@ -5,7 +5,7 @@
 (defvar aosp-board-name nil)
 (defvar aosp-build-variant nil)
 (defvar aosp-thread-number nil)
-(defvar aosp-compile-options "")
+(defvar aosp-compile-options '())
 (defvar aosp-env-vars '())
 
 ;; Internal
@@ -22,6 +22,7 @@
 (defvar pm-android-compile-history '())
 (defvar pm-android-interactive-history '())
 (defvar pm-android-subprojects-history '())
+(defvar pm-android-compile-options-history '())
 
 (defvar pm-android-subprojects '(("out"	.	(concat "/out/target/product/" aosp-board-name "/"))
 				 ("pub"	.	(concat "/pub/" (upcase aosp-board-name) "/"))))
@@ -63,8 +64,10 @@
   (let ((default-directory (concat aosp-path "/")))
     (compile (concat (pm-android-load-compile-env)
 		     "make -j" (number-to-string aosp-thread-number) " "
-		     aosp-compile-options " "
-		     target))))
+		     (if aosp-compile-options
+			 (mapconcat 'identity aosp-compile-options " ")
+		       "")
+		     " " target))))
 
 (defun pm-android-subproject ()
   (let ((cur-path (expand-file-name default-directory)))
@@ -93,6 +96,20 @@
 					      nil t nil 'pm-android-subprojects-history)))
 	 (default-directory (concat aosp-path (eval (assoc-default subproject subprojects)))))
     (ido-find-file)))
+
+(defun pm-android-toggle-command (cmd)
+  (interactive (list (read-string "Compilation option: " nil
+				  'pm-android-compile-options-history)))
+  (let ((msg-fmt "Compilation option \"%s\" %s."))
+  (if (find cmd aosp-compile-options :test 'string=)
+      (progn (setq aosp-compile-options (delete cmd aosp-compile-options))
+	     (message (propertize (format msg-fmt cmd "deactivated") 'face 'error)))
+    (add-to-list 'aosp-compile-options cmd)
+    (message (propertize (format msg-fmt cmd "activated") 'face 'success)))))
+  
+(defun pm-android-toggle-showcommands ()
+  (interactive)
+  (pm-android-toggle-command "showcommands"))
 
 (pm-register-backend
  (make-pm-backend :name "android"
