@@ -112,8 +112,13 @@
   (interactive)
   (pm-android-toggle-command "showcommands"))
 
+(defun pm-android-open-hook ()
+  (message "pm-android-open-hook called")
+  (setq aosp-path current-root-path))
+
 (pm-register-backend
  (make-pm-backend :name "android"
+		  :open-hook 'pm-android-open-hook
 		  :find-file 'pm-android-find-file
 		  :find-file-hook 'pm-android-find-file-hook
 		  :compile 'pm-android-compile))
