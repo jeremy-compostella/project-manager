@@ -4,7 +4,8 @@
   name
   pm-backend
   env-vars
-  subprojects)
+  subprojects
+  root-path)
 
 (defstruct pm-backend
   name
@@ -26,8 +27,13 @@
     (setq project-env-vars nil)))
 
 (defun project-backend (project)
-  (find (project-pm-backend project) pm-backends
-	:test 'string= :key 'pm-backend-name))
+  (unless (or project (project-p project))
+    (error "Invalid project"))
+  (let ((backend (find (project-pm-backend project) pm-backends
+		       :test 'string= :key 'pm-backend-name)))
+    (unless backend
+      (error "%s backend not found" (pm-backend-name project)))
+    backend))
 
 (defun switch-project (project-name)
   (interactive (list (ido-completing-read (format "Project name%s: "
@@ -75,5 +81,16 @@
 (defun project-compile ()
   (interactive)
   (call-interactively (pm-backend-compile (project-backend current-project))))
+
+(defun project-smart-compile ()
+  (interactive)
+  (let ((proj (remove-if-not (rcurry 'string-prefix-p default-directory)
+			     projects :key 'project-root-path)))
+    (if (not proj)
+	(compile)
+      (cond ((= (length proj) 1) (switch-project (project-name (car proj))))
+	    ((switch-project (ido-completing-read "Project name: "
+						  (mapcar 'project-name proj) nil t))))
+      (project-compile))))
 
 (provide 'project-manager)
