@@ -32,7 +32,7 @@
   (let ((backend (find (project-pm-backend project) pm-backends
 		       :test 'string= :key 'pm-backend-name)))
     (unless backend
-      (error "%s backend not found" (pm-backend-name project)))
+      (error "%s backend not found" (project-pm-backend project)))
     backend))
 
 (defun switch-project (project-name)
