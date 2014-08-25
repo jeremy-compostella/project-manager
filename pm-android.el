@@ -92,19 +92,11 @@
 	       (string-prefix-p (aosp-path) file-name))
       (project-uniquify-buffer-name (pm-android-subproject)))))
 
-(defun pm-android-find-file (&optional subproject)
+(defun pm-android-find-file ()
   (interactive)
-  (let* ((subprojects (append (project-subprojects current-project)
-			      pm-android-subprojects))
-	 (subprojects (delete-if-not 'file-exists-p subprojects
-				     :key (lambda (x) (concat aosp-path (eval (cdr x))))))
-	 (subproject (or subproject
-			 (ido-completing-read (format "Subproject (project %s): "
-						      (project-name current-project))
-					      subprojects
-					      nil t nil 'pm-android-subprojects-history)))
-	 (default-directory (concat aosp-path (eval (assoc-default subproject subprojects)))))
-    (ido-find-file)))
+  (project-find-file-subproject (append (project-subprojects current-project)
+					pm-android-subprojects)
+				'pm-android-subprojects-history))
 
 (defun pm-android-toggle-command (cmd)
   (interactive (list (read-string "Compilation option: " nil

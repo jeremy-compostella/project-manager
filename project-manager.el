@@ -79,6 +79,20 @@
   (interactive)
   (call-interactively (pm-backend-find-file (project-backend current-project))))
 
+(defun project-find-file-subproject (&optional subprojects history)
+  (interactive)
+  (let* ((subprojects (or subprojects (project-subprojects current-project)))
+	 (subprojects (delete-if-not 'file-exists-p subprojects
+				     :key (lambda (x)
+					    (concat current-root-path (eval (cdr x))))))
+	 (subproject (ido-completing-read (format "Subproject (project %s): "
+						  (project-name current-project))
+					  subprojects
+					  nil t nil history))
+	 (default-directory (concat current-root-path
+				    (eval (assoc-default subproject subprojects)))))
+    (ido-find-file)))
+
 (defun project-compile ()
   (interactive)
   (call-interactively (pm-backend-compile (project-backend current-project))))
