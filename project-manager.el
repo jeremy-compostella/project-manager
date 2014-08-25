@@ -19,6 +19,7 @@
 (defvar pm-backends '())
 (defvar current-project nil)
 (defvar project-env-vars '())
+(defvar current-root-path nil)
 
 (defun restore-env-vars ()
   (when project-env-vars
@@ -46,6 +47,7 @@
     (when current-project
       (funcall (pm-backend-close-hook (project-backend current-project))))
     (restore-env-vars)
+    (setq current-root-path (project-root-path project))
     (dolist (elm (project-env-vars project))
       (set (car elm) (eval (cdr elm))))
     (setq current-project project)
