@@ -30,6 +30,13 @@
 (defsubst pm-android-device ()
   (concat aosp-board-name "-" aosp-build-variant))
 
+(defun pm-android-hostname (&optional dir)
+  (let ((dir (or dir default-directory)))
+    (or (and (tramp-tramp-file-p dir)
+	     (with-parsed-tramp-file-name dir info
+	       info-host))
+	"localhost")))
+
 (defsubst pm-android-load-compile-env ()
   (concat (when aosp-env-vars
 	    (concat "export "
@@ -40,7 +47,8 @@
 	  "lunch " (pm-android-device) " && "))
 
 (defun pm-android-compile (target)
-  (interactive (list (ido-completing-read (format "Build target (%s): " (pm-android-device))
+  (interactive (list (ido-completing-read (format "Build target (%s on %s): "
+						  (pm-android-device) (pm-android-hostname))
 					  (mapcar 'car pm-android-targets)
 					  nil t nil 'pm-android-compile-history)))
   (let ((t-or-f (assoc-default target pm-android-targets)))
