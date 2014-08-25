@@ -49,7 +49,8 @@
     (dolist (elm (project-env-vars project))
       (set (car elm) (eval (cdr elm))))
     (setq current-project project)
-    (funcall (pm-backend-open-hook (project-backend project)))))
+    (funcall (pm-backend-open-hook (project-backend project)))
+    (message "Successfull switched to project %s." (project-name current-project))))
 
 (defun project-uniquify-buffer-name (suffix)
   (let ((filename (buffer-file-name buf)))
@@ -87,10 +88,15 @@
   (let ((proj (remove-if-not (rcurry 'string-prefix-p default-directory)
 			     projects :key 'project-root-path)))
     (if (not proj)
-	(compile)
-      (cond ((= (length proj) 1) (switch-project (project-name (car proj))))
-	    ((switch-project (ido-completing-read "Project name: "
-						  (mapcar 'project-name proj) nil t))))
-      (project-compile))))
+	(if (not current-project)
+	    (compile)
+	  (project-compile))
+      (let ((new-proj
+	     (cond ((= (length proj) 1) (project-name (car proj)))
+		   ((ido-completing-read "Project name: "
+					 (mapcar 'project-name proj) nil t)))))
+	(unless (string= new-proj (project-name current-project))
+	  (switch-project new-proj))
+	(project-compile)))))
 
 (provide 'project-manager)
