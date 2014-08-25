@@ -16,7 +16,7 @@
     ("recovery"			.	"recoveryimage")
     ("system"			.	"systemimage")
     ("adb-fastboot"		.       "adb fastboot")
-    ("Windows-adb-fastboot"	.       "adb fastboot publish_windows_tools USE_MINGW=y")
+    ("Windows-adb-fastboot"	.       "adb fastboot USE_MINGW=y")
     ("interactive"		.	pm-android-interactive-target)
     ("clean"			.	pm-android-clean-build)))
 
