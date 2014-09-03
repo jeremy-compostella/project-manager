@@ -87,6 +87,7 @@
 	 (subprojects (delete-if-not 'file-exists-p subprojects
 				     :key (lambda (x)
 					    (concat current-root-path (eval (cdr x))))))
+	 (subprojects (cons (cons "root" "/") subprojects))
 	 (subproject (ido-completing-read (format "Subproject (project %s): "
 						  (project-name current-project))
 					  subprojects
