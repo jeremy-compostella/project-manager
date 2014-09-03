@@ -48,7 +48,8 @@
 	  "lunch " (pm-android-device) " && "))
 
 (defun pm-android-compile (target)
-  (interactive (list (ido-completing-read (format "Build target (%s on %s): "
+  (interactive (list (ido-completing-read (format "Build target (%s:%s on %s): "
+						  (project-name current-project)
 						  (pm-android-device) (pm-android-hostname))
 					  (mapcar 'car pm-android-targets)
 					  nil t nil 'pm-android-compile-history)))
