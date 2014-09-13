@@ -52,7 +52,8 @@
       (set (car elm) (eval (cdr elm))))
     (setq current-project project)
     (funcall (pm-backend-open-hook (project-backend project)))
-    (message "Successfull switched to project %s." (project-name current-project))))
+    (message "Successfull switched to project %s." (propertize (project-name current-project)
+							       'face 'success))))
 
 (defun project-uniquify-buffer-name (suffix)
   (let ((filename (buffer-file-name buf)))
