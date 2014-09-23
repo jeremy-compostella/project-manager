@@ -63,6 +63,16 @@
   (when (y-or-n-p "Are you sure you want to clean all your repo ?")
     (pm-android-build-target "clean")))
 
+(defun pm-android-build-current ()
+  (interactive)
+  (let* ((module-dir (untramp-path default-directory))
+	 (default-directory (concat aosp-path "/")))
+    (compile (concat (pm-android-load-compile-env)
+		     (format "cd %s && mm -j%d" module-dir aosp-thread-number)
+		     (if aosp-compile-options
+			 (mapconcat 'identity aosp-compile-options " ")
+		       "")))))
+
 (defun pm-android-interactive-target (target)
   (interactive (list (read-string (format "Target (default: %s): "
 					  (or (car pm-android-interactive-history) ""))
