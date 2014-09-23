@@ -48,10 +48,11 @@
       (funcall (pm-backend-close-hook (project-backend current-project))))
     (restore-env-vars)
     (setq current-root-path (project-root-path project))
+    (setq current-project project)
     (dolist (elm (project-env-vars project))
       (set (car elm) (eval (cdr elm))))
-    (setq current-project project)
     (funcall (pm-backend-open-hook (project-backend project)))
+    (run-hooks 'project-manager-switch-hook)
     (message "Successfull switched to project %s." (propertize (project-name current-project)
 							       'face 'success))))
 
@@ -77,6 +78,12 @@
 					  (mapcar 'project-name projects) nil t)))
   (setq projects (delete-if (curry 'string= project-name)
 			    projects :key 'project-name)))
+
+(defun unregister-backend (backend-name)
+  (interactive (list (ido-completing-read "Backend name: "
+					  (mapcar 'pm-backend-name pm-backends) nil t)))
+  (setq pm-backends (delete-if (curry 'string= backend-name)
+                               pm-backends :key 'pm-backend-name)))
 
 (defun project-find-file ()
   (interactive)
