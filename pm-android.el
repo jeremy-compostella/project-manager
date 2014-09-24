@@ -127,6 +127,17 @@
   (message "pm-android-open-hook called")
   (setq aosp-path current-root-path))
 
+(defun pm-android-lunch-list ()
+  (let ((default-directory (concat aosp-path "/")))
+    (shell-command-to-string "source build/envsetup.sh >/dev/null 2>&1 && echo ${LUNCH_MENU_CHOICES[*]}")))
+
+(defun pm-android-set-board (board)
+  "Set the android board to compile"
+  (interactive (list (ido-completing-read "Board: " (split-string (lunch-list)))))
+  (string-match "\\([a-z0-9_]+\\)-\\(\\w+\\)" board)
+  (setq aosp-board-name (match-string 1 board))
+  (setq aosp-build-variant (match-string 2 board)))
+
 (pm-register-backend
  (make-pm-backend :name "android"
 		  :open-hook 'pm-android-open-hook
