@@ -18,7 +18,8 @@
     ("adb-fastboot"		.       "adb fastboot")
     ("Windows-adb-fastboot"	.       "adb fastboot USE_MINGW=y")
     ("interactive"		.	pm-android-interactive-target)
-    ("clean"			.	pm-android-clean-build)))
+    ("clean"			.	pm-android-clean-build)
+    ("repo-sync"		.	pm-android-repo-sync)))
 
 (defvar pm-android-compile-history '())
 (defvar pm-android-interactive-history '())
@@ -63,10 +64,15 @@
   (when (y-or-n-p "Are you sure you want to clean all your repo ?")
     (pm-android-build-target "clean")))
 
+(defun pm-android-repo-sync ()
+  (interactive)
+  (let ((default-directory (concat aosp-path "/")))
+    (compile (format "repo sync -j%d" aosp-thread-number))))
+
 (defun pm-android-build-current ()
   (interactive)
-  (let* ((module-dir (untramp-path default-directory))
-	 (default-directory (concat aosp-path "/")))
+  (let ((module-dir (untramp-path default-directory))
+	(default-directory (concat aosp-path "/")))
     (compile (concat (pm-android-load-compile-env)
 		     (format "cd %s && mm -j%d" module-dir aosp-thread-number)
 		     (if aosp-compile-options
