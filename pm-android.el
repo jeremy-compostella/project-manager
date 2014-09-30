@@ -139,7 +139,7 @@
 
 (defun pm-android-set-board (board)
   "Set the android board to compile"
-  (interactive (list (ido-completing-read "Board: " (split-string (lunch-list)))))
+  (interactive (list (ido-completing-read "Board: " (split-string (pm-android-lunch-list)))))
   (string-match "\\([a-z0-9_]+\\)-\\(\\w+\\)" board)
   (setq aosp-board-name (match-string 1 board))
   (setq aosp-build-variant (match-string 2 board)))
