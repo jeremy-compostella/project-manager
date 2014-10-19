@@ -15,6 +15,10 @@
   (find-file-hook 'ignore)
   (compile 'ignore))
 
+(defvar project-manager-switch-hook '()
+  "Hook list runned when you swith from one project to
+  another.")
+
 (defvar projects '())
 (defvar pm-backends '())
 (defvar current-project nil)
