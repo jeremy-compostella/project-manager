@@ -28,7 +28,7 @@
 
 (defvar pm-android-subprojects '(("out"	.	(concat "/out/target/product/" aosp-board-name "/"))
 				 ("pub"	.	(concat "/pub/" (upcase aosp-board-name) "/"))))
-  
+
 (defsubst pm-android-device ()
   (concat aosp-board-name "-" aosp-build-variant))
 
@@ -39,12 +39,15 @@
 	       info-host))
 	"localhost")))
 
+(defsubst pm-android-env-vars ()
+  (when aosp-env-vars
+    (concat "export "
+	    (mapconcat (lambda (x) (format "%s=%S" (car x) (eval (cdr x))))
+		       aosp-env-vars " ")
+	    " && ")))
+
 (defsubst pm-android-load-compile-env ()
-  (concat (when aosp-env-vars
-	    (concat "export "
-		    (mapconcat (lambda (x) (format "%s=%S" (car x) (eval (cdr x))))
-			       aosp-env-vars " ")
-		    " && "))
+  (concat (pm-android-env-vars)
 	  "source build/envsetup.sh && "
 	  "lunch " (pm-android-device) " && "))
 
@@ -67,7 +70,8 @@
 (defun pm-android-repo-sync ()
   (interactive)
   (let ((default-directory (concat aosp-path "/")))
-    (compile (format "repo sync -j%d" aosp-thread-number))))
+    (compile (concat (pm-android-env-vars)
+		     (format "repo sync -j%d" aosp-thread-number)))))
 
 (defun pm-android-build-current ()
   (interactive)
@@ -124,7 +128,7 @@
 	     (message (propertize (format msg-fmt cmd "deactivated") 'face 'error)))
     (add-to-list 'aosp-compile-options cmd)
     (message (propertize (format msg-fmt cmd "activated") 'face 'success)))))
-  
+
 (defun pm-android-toggle-showcommands ()
   (interactive)
   (pm-android-toggle-command "showcommands"))
