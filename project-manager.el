@@ -13,6 +13,7 @@
   (close-hook 'ignore)
   (find-file 'ignore)
   (find-file-hook 'ignore)
+  (search 'ignore)
   (compile 'ignore))
 
 (defvar project-manager-switch-hook '()
@@ -107,6 +108,10 @@
 	 (default-directory (concat current-root-path
 				    (eval (assoc-default subproject subprojects)))))
     (ido-find-file)))
+
+(defun project-search ()
+  (interactive)
+  (call-interactively (pm-backend-search (project-backend current-project))))
 
 (defun project-compile ()
   (interactive)
