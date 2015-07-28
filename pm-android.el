@@ -21,10 +21,17 @@
     ("clean"			.	pm-android-clean-build)
     ("repo-sync"		.	pm-android-repo-sync)))
 
+(defvar pm-android-search-tools
+  '(("mgrep"       "mgrep "  nil)
+    ("cgrep"       "cgrep "  nil)
+    ("jgrep"       "jgrep "  nil)
+    ("find-module" "mgrep "  " | grep LOCAL_MODULE")))
+
 (defvar pm-android-compile-history '())
 (defvar pm-android-interactive-history '())
 (defvar pm-android-subprojects-history '())
 (defvar pm-android-compile-options-history '())
+(defvar pm-android-search-history '())
 
 (defvar pm-android-subprojects '(("out"	.	(concat "/out/target/product/" aosp-board-name "/"))
 				 ("pub"	.	(concat "/pub/" (upcase aosp-board-name) "/"))))
@@ -50,6 +57,27 @@
   (concat (pm-android-env-vars)
 	  "source build/envsetup.sh && "
 	  "lunch " (pm-android-device) " && "))
+
+;; Search tools
+(defun pm-android-search (search command-args)
+  (interactive (list (ido-completing-read "Search tools: "
+					  (mapcar 'car pm-android-search-tools)
+					  nil t nil nil)
+		     (read-string "Pattern: "
+				  nil 'pm-android-search-history
+				  (car pm-android-search-history))))
+  (let ((module-dir default-directory)
+	(default-directory (concat aosp-path "/")))
+    (unless (string-match default-directory module-dir)
+      (setq module-dir default-directory))
+    (compilation-start (concat "source build/envsetup.sh && "
+			       (format "cd %s && " (untramp-path module-dir))
+			       (car (assoc-default search pm-android-search-tools))
+			       command-args " ./ "
+			       (car (last (assoc-default search pm-android-search-tools))))
+		       'grep-mode)
+    (with-current-buffer "*grep*"
+      (setq default-directory module-dir))))
 
 (defun pm-android-compile (target)
   (interactive (list (ido-completing-read (format "Build target (%s:%s on %s): "
@@ -153,6 +181,7 @@
 		  :open-hook 'pm-android-open-hook
 		  :find-file 'pm-android-find-file
 		  :find-file-hook 'pm-android-find-file-hook
+		  :search 'pm-android-search
 		  :compile 'pm-android-compile))
 
 (provide 'pm-android)
